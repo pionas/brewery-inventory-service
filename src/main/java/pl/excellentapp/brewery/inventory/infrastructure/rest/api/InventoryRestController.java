@@ -43,7 +43,7 @@ class InventoryRestController {
 
     @PostMapping
     public ResponseEntity<InventoryResponse> createInventory(@Valid @RequestBody InventoryRequest inventoryRequest) {
-        final var inventoryResponse = inventoryRestMapper.map(beerInventoryService.create(inventoryRestMapper.map(inventoryRequest)));
+        final var inventoryResponse = inventoryRestMapper.map(beerInventoryService.create(inventoryRequest.getBeerId(), inventoryRequest.getAvailableStock()));
 
         return new ResponseEntity<>(inventoryResponse, HttpStatus.CREATED);
     }

@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import pl.excellentapp.brewery.inventory.domain.beerinventory.BeerHistoryType;
 
@@ -25,6 +26,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "beer_inventory_history")
+@ToString(exclude = {"beerInventory"})
 public class BeerInventoryEventEntity {
 
     @Id

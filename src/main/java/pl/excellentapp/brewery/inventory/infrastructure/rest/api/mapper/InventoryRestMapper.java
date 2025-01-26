@@ -1,6 +1,7 @@
 package pl.excellentapp.brewery.inventory.infrastructure.rest.api.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import pl.excellentapp.brewery.inventory.domain.beerinventory.BeerInventory;
 import pl.excellentapp.brewery.inventory.infrastructure.rest.api.dto.InventoryRequest;
 import pl.excellentapp.brewery.inventory.infrastructure.rest.api.dto.InventoryResponse;
@@ -13,13 +14,14 @@ public interface InventoryRestMapper {
 
     BeerInventory map(InventoryRequest inventoryRequest);
 
+    @Mapping(target = "id", source = "beerId")
     InventoryResponse map(BeerInventory beerInventory);
 
-    List<InventoryResponse> mapInventorys(List<BeerInventory> all);
+    List<InventoryResponse> mapInventories(List<BeerInventory> all);
 
     default InventorysResponse map(List<BeerInventory> all) {
         return InventorysResponse.builder()
-                .inventorys(mapInventorys(all))
+                .inventorys(mapInventories(all))
                 .build();
     }
 }

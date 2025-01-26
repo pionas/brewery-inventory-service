@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import pl.excellentapp.brewery.inventory.domain.exception.BeerInsufficientStockException;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,11 +19,16 @@ public class BeerInventory {
 
     private UUID beerId;
     private int availableStock;
-    private List<BeerInventoryEvent> history;
+    @Builder.Default
+    private List<BeerInventoryEvent> history = new ArrayList<>();
+
+    public BeerInventory(UUID beerId) {
+        this.beerId = beerId;
+    }
 
     public void addStock(int quantity, LocalDateTime now) {
         this.availableStock += quantity;
-        history.add(new BeerInventoryEvent(BeerHistoryType.BREWED, quantity, now));
+        history.add(BeerInventoryEvent.brewed(quantity, now, this));
     }
 
     public void reserveStock(int quantity, LocalDateTime now) throws BeerInsufficientStockException {
@@ -30,11 +36,11 @@ public class BeerInventory {
             throw new BeerInsufficientStockException("Not enough stock to reserve.");
         }
         this.availableStock -= quantity;
-        history.add(new BeerInventoryEvent(BeerHistoryType.RESERVED, quantity, now));
+        history.add(BeerInventoryEvent.reserved(quantity, now, this));
     }
 
     public void releaseStock(int quantity, LocalDateTime now) {
         this.availableStock += quantity;
-        history.add(new BeerInventoryEvent(BeerHistoryType.CANCELLED, quantity, now));
+        history.add(BeerInventoryEvent.cancelled(quantity, now, this));
     }
 }

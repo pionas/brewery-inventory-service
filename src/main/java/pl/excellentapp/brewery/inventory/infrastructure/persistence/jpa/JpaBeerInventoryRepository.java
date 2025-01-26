@@ -23,7 +23,11 @@ class JpaBeerInventoryRepository implements BeerInventoryRepository {
 
     @Override
     public BeerInventory save(BeerInventory beerInventory) {
-        return inventoryMapper.map(springJpaInventoryRepository.save(inventoryMapper.map(beerInventory)));
+        return Optional.of(beerInventory)
+                .map(inventoryMapper::map)
+                .map(springJpaInventoryRepository::save)
+                .map(inventoryMapper::map)
+                .orElseThrow(IllegalStateException::new);
     }
 
     @Override

@@ -29,7 +29,11 @@ public class BeerInventoryServiceImpl implements BeerInventoryService {
     }
 
     @Override
-    public BeerInventory create(BeerInventory beerInventory) {
+    public BeerInventory create(UUID beerId, int availableStock) {
+        final var beerInventory = BeerInventory.builder()
+                .beerId(beerId)
+                .build();
+        beerInventory.addStock(availableStock, dateTimeProvider.now().toLocalDateTime());
         return beerInventoryRepository.save(beerInventory);
     }
 
@@ -53,7 +57,6 @@ public class BeerInventoryServiceImpl implements BeerInventoryService {
         beerInventory.releaseStock(quantity, dateTimeProvider.now().toLocalDateTime());
         return beerInventoryRepository.save(beerInventory);
     }
-
 
     @Override
     public void delete(UUID inventoryId) {

@@ -1,6 +1,8 @@
 package pl.excellentapp.brewery.inventory.infrastructure.persistence.jpa;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import pl.excellentapp.brewery.inventory.domain.beerinventory.BeerInventory;
 import pl.excellentapp.brewery.inventory.domain.beerinventory.BeerInventoryEvent;
 
@@ -18,8 +20,10 @@ interface InventoryMapper {
 
     BeerInventoryEntity map(BeerInventory beerInventory);
 
+    @Mapping(target = "beerInventory", expression = "java(mapCustomBeerInventory(beerInventoryEvent.getBeerInventory()))")
     BeerInventoryEventEntity map(BeerInventoryEvent beerInventoryEvent);
 
+    @Mapping(target = "beerInventory", qualifiedByName = "mapCustomBeerInventory")
     BeerInventoryEvent map(BeerInventoryEventEntity beerInventoryEventEntity);
 
     default Timestamp map(OffsetDateTime value) {
@@ -38,4 +42,14 @@ interface InventoryMapper {
     default LocalDateTime mapToLocalDateTime(Timestamp value) {
         return value == null ? null : value.toLocalDateTime();
     }
+
+    default BeerInventoryEntity mapCustomBeerInventory(BeerInventory beerInventory) {
+        return beerInventory == null ? null : new BeerInventoryEntity(beerInventory.getBeerId());
+    }
+
+    @Named("mapCustomBeerInventory")
+    default BeerInventory mapCustomBeerInventory(BeerInventoryEntity beerInventory) {
+        return beerInventory == null ? null : new BeerInventory(beerInventory.getBeerId());
+    }
+
 }
