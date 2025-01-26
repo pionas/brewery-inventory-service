@@ -30,6 +30,9 @@ public class BeerInventoryServiceImpl implements BeerInventoryService {
 
     @Override
     public BeerInventory create(UUID beerId, int availableStock) {
+        if (beerInventoryRepository.findById(beerId).isPresent()) {
+            throw new IllegalStateException("Beer inventory exists");
+        }
         final var beerInventory = BeerInventory.builder()
                 .beerId(beerId)
                 .build();
