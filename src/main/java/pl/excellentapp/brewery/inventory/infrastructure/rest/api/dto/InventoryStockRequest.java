@@ -1,19 +1,17 @@
 package pl.excellentapp.brewery.inventory.infrastructure.rest.api.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class InventoryRequest {
+public class InventoryStockRequest {
 
-    private UUID beerId;
-    private int availableStock;
-
+    @NotNull(message = "Stock cannot be null")
+    private Integer stock;
 }

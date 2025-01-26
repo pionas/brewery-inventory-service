@@ -14,7 +14,11 @@ public interface BeerInventoryService {
 
     BeerInventory create(BeerInventory beerInventory);
 
-    BeerInventory update(UUID inventoryId, BeerInventory beerInventory);
+    BeerInventory addStock(UUID beerId, int availableStock);
+
+    BeerInventory reserveStock(UUID beerId, int quantity);
+
+    BeerInventory releaseStock(UUID beerId, int quantity);
 
     void delete(UUID inventoryId);
 }

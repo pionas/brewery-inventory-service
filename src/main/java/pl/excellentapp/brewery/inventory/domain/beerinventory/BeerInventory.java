@@ -16,7 +16,6 @@ import java.util.UUID;
 @Builder
 public class BeerInventory {
 
-    private UUID id;
     private UUID beerId;
     private int availableStock;
     private List<BeerInventoryEvent> history;
