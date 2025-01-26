@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 import java.util.UUID;
 
 @Repository
-interface SpringJpaInventoryRepository extends CrudRepository<InventoryEntity, UUID> {
+interface SpringJpaInventoryRepository extends CrudRepository<BeerInventoryEntity, UUID> {
 }

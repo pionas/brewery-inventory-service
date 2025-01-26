@@ -2,8 +2,8 @@ package pl.excellentapp.brewery.inventory.infrastructure.persistence.jpa;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
-import pl.excellentapp.brewery.inventory.domain.Inventory;
-import pl.excellentapp.brewery.inventory.domain.InventoryRepository;
+import pl.excellentapp.brewery.inventory.domain.beerinventory.BeerInventory;
+import pl.excellentapp.brewery.inventory.domain.beerinventory.BeerInventoryRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,23 +11,23 @@ import java.util.UUID;
 
 @Repository
 @AllArgsConstructor
-class JpaInventoryRepository implements InventoryRepository {
+class JpaBeerInventoryRepository implements BeerInventoryRepository {
 
     private final SpringJpaInventoryRepository springJpaInventoryRepository;
     private final InventoryMapper inventoryMapper;
 
     @Override
-    public List<Inventory> findAll() {
+    public List<BeerInventory> findAll() {
         return inventoryMapper.map(springJpaInventoryRepository.findAll());
     }
 
     @Override
-    public Inventory save(Inventory inventory) {
-        return inventoryMapper.map(springJpaInventoryRepository.save(inventoryMapper.map(inventory)));
+    public BeerInventory save(BeerInventory beerInventory) {
+        return inventoryMapper.map(springJpaInventoryRepository.save(inventoryMapper.map(beerInventory)));
     }
 
     @Override
-    public Optional<Inventory> findById(UUID id) {
+    public Optional<BeerInventory> findById(UUID id) {
         return springJpaInventoryRepository.findById(id)
                 .map(inventoryMapper::map);
     }

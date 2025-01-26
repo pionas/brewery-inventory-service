@@ -19,7 +19,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class InventoryRestControllerIT extends AbstractIT {
+class BeerInventoryRestControllerIT extends AbstractIT {
 
     private final String MODEL_API_URL = "/api/v1/inventorys";
 

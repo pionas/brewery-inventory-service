@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pl.excellentapp.brewery.inventory.application.InventoryService;
-import pl.excellentapp.brewery.inventory.domain.exception.InventoryNotFoundException;
+import pl.excellentapp.brewery.inventory.application.BeerInventoryService;
+import pl.excellentapp.brewery.inventory.domain.exception.BeerInventoryNotFoundException;
 import pl.excellentapp.brewery.inventory.infrastructure.rest.api.dto.InventoryRequest;
 import pl.excellentapp.brewery.inventory.infrastructure.rest.api.dto.InventoryResponse;
 import pl.excellentapp.brewery.inventory.infrastructure.rest.api.dto.InventorysResponse;
@@ -30,17 +30,17 @@ import java.util.UUID;
 @RequestMapping("/api/v1/inventorys")
 class InventoryRestController {
 
-    private final InventoryService inventoryService;
+    private final BeerInventoryService beerInventoryService;
     private final InventoryRestMapper inventoryRestMapper;
 
     @GetMapping({"", "/"})
     public ResponseEntity<InventorysResponse> getInventorys() {
-        return new ResponseEntity<>(inventoryRestMapper.map(inventoryService.findAll()), HttpStatus.OK);
+        return new ResponseEntity<>(inventoryRestMapper.map(beerInventoryService.findAll()), HttpStatus.OK);
     }
 
     @GetMapping("/{inventoryId}")
     public ResponseEntity<InventoryResponse> getInventory(@PathVariable("inventoryId") UUID inventoryId) {
-        return inventoryService.findById(inventoryId)
+        return beerInventoryService.findById(inventoryId)
                 .map(inventoryRestMapper::map)
                 .map(inventoryResponse -> new ResponseEntity<>(inventoryResponse, HttpStatus.OK))
                 .orElse(ResponseEntity.notFound().build());
@@ -48,26 +48,26 @@ class InventoryRestController {
 
     @PostMapping
     public ResponseEntity<InventoryResponse> createInventory(@Valid @RequestBody InventoryRequest inventoryRequest) {
-        final var inventoryResponse = inventoryRestMapper.map(inventoryService.create(inventoryRestMapper.map(inventoryRequest)));
+        final var inventoryResponse = inventoryRestMapper.map(beerInventoryService.create(inventoryRestMapper.map(inventoryRequest)));
 
         return new ResponseEntity<>(inventoryResponse, HttpStatus.CREATED);
     }
 
     @PutMapping("/{inventoryId}")
     public ResponseEntity<InventoryResponse> updateInventory(@PathVariable("inventoryId") UUID inventoryId, @Valid @RequestBody InventoryRequest inventoryRequest) {
-        final var inventoryResponse = inventoryRestMapper.map(inventoryService.update(inventoryId, inventoryRestMapper.map(inventoryRequest)));
+        final var inventoryResponse = inventoryRestMapper.map(beerInventoryService.update(inventoryId, inventoryRestMapper.map(inventoryRequest)));
 
         return new ResponseEntity<>(inventoryResponse, HttpStatus.OK);
     }
 
     @DeleteMapping("/{inventoryId}")
     public ResponseEntity<HttpStatus> deleteInventory(@PathVariable("inventoryId") UUID inventoryId) {
-        inventoryService.delete(inventoryId);
+        beerInventoryService.delete(inventoryId);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
-    @ExceptionHandler(InventoryNotFoundException.class)
-    public ResponseEntity<Object> handle(InventoryNotFoundException ex) {
+    @ExceptionHandler(BeerInventoryNotFoundException.class)
+    public ResponseEntity<Object> handle(BeerInventoryNotFoundException ex) {
         return handleError(HttpStatus.NOT_FOUND, List.of(ex.getMessage()));
     }
 

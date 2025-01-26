@@ -1,7 +1,7 @@
 package pl.excellentapp.brewery.inventory.infrastructure.persistence.jpa;
 
 import org.mapstruct.Mapper;
-import pl.excellentapp.brewery.inventory.domain.Inventory;
+import pl.excellentapp.brewery.inventory.domain.beerinventory.BeerInventory;
 
 import java.sql.Timestamp;
 import java.time.OffsetDateTime;
@@ -10,11 +10,11 @@ import java.util.List;
 @Mapper
 interface InventoryMapper {
 
-    List<Inventory> map(Iterable<InventoryEntity> inventoryEntities);
+    List<BeerInventory> map(Iterable<BeerInventoryEntity> inventoryEntities);
 
-    Inventory map(InventoryEntity inventoryEntity);
+    BeerInventory map(BeerInventoryEntity beerInventoryEntity);
 
-    InventoryEntity map(Inventory inventory);
+    BeerInventoryEntity map(BeerInventory beerInventory);
 
     default Timestamp map(OffsetDateTime value) {
         return value == null ? null : Timestamp.from(value.toInstant());

@@ -2,12 +2,11 @@ package pl.excellentapp.brewery.inventory.application;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import pl.excellentapp.brewery.inventory.domain.Inventory;
-import pl.excellentapp.brewery.inventory.domain.InventoryRepository;
-import pl.excellentapp.brewery.inventory.domain.exception.InventoryNotFoundException;
+import pl.excellentapp.brewery.inventory.domain.beerinventory.BeerInventory;
+import pl.excellentapp.brewery.inventory.domain.beerinventory.BeerInventoryRepository;
+import pl.excellentapp.brewery.inventory.domain.exception.BeerInventoryNotFoundException;
 import pl.excellentapp.brewery.inventory.utils.DateTimeProvider;
 
-import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -17,14 +16,14 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class InventoryServiceTest {
+class BeerBeerInventoryServiceTest {
 
     private static final OffsetDateTime OFFSET_DATE_TIME = OffsetDateTime.of(2025, 1, 23, 12, 7, 0, 0, ZoneOffset.UTC);
 
-    private final InventoryRepository inventoryRepository = Mockito.mock(InventoryRepository.class);
+    private final BeerInventoryRepository beerInventoryRepository = Mockito.mock(BeerInventoryRepository.class);
     private final DateTimeProvider dateTimeProvider = Mockito.mock(DateTimeProvider.class);
 
-    private final InventoryService inventoryService = new InventoryServiceImpl(inventoryRepository, dateTimeProvider);
+    private final BeerInventoryService beerInventoryService = new BeerInventoryServiceImpl(beerInventoryRepository, dateTimeProvider);
 
 
     @Test
@@ -42,58 +41,58 @@ class InventoryServiceTest {
                 createInventory(UUID.fromString("9c3e5d7a-b8f2-41c3-82e9-f2b1d6e5c4f7"), OFFSET_DATE_TIME),
                 createInventory(UUID.fromString("0d1e2f3b-5a7c-4d1f-8e9b-2f3d6a8b7c5f"), OFFSET_DATE_TIME)
         );
-        when(inventoryRepository.findAll()).thenReturn(inventorys);
+        when(beerInventoryRepository.findAll()).thenReturn(inventorys);
 
         // when
-        final var result = inventoryService.findAll();
+        final var result = beerInventoryService.findAll();
 
         // then
         assertEquals(10, result.size());
         assertEquals(inventorys, result);
-        verify(inventoryRepository, times(1)).findAll();
+        verify(beerInventoryRepository, times(1)).findAll();
     }
 
     @Test
     void findById_ShouldReturnInventory_WhenInventoryExists() {
         // given
         final var inventory = createInventory(UUID.fromString("71737f0e-11eb-4775-b8b4-ce945fdee936"), OFFSET_DATE_TIME);
-        when(inventoryRepository.findById(inventory.getId())).thenReturn(Optional.of(inventory));
+        when(beerInventoryRepository.findById(inventory.getId())).thenReturn(Optional.of(inventory));
 
         // when
-        final var result = inventoryService.findById(inventory.getId());
+        final var result = beerInventoryService.findById(inventory.getId());
 
         // then
         assertTrue(result.isPresent());
         assertEquals(inventory, result.get());
-        verify(inventoryRepository, times(1)).findById(inventory.getId());
+        verify(beerInventoryRepository, times(1)).findById(inventory.getId());
     }
 
     @Test
     void findById_ShouldThrowException_WhenInventoryNotFound() {
         // given
         final var inventory = createInventory(UUID.fromString("71737f0e-11eb-4775-b8b4-ce945fdee936"), OFFSET_DATE_TIME);
-        when(inventoryRepository.findById(inventory.getId())).thenReturn(Optional.empty());
+        when(beerInventoryRepository.findById(inventory.getId())).thenReturn(Optional.empty());
 
         // when
-        final var inventoryOptional = inventoryService.findById(inventory.getId());
+        final var inventoryOptional = beerInventoryService.findById(inventory.getId());
 
         // then
         assertTrue(inventoryOptional.isEmpty());
-        verify(inventoryRepository, times(1)).findById(inventory.getId());
+        verify(beerInventoryRepository, times(1)).findById(inventory.getId());
     }
 
     @Test
     void create_ShouldSaveAndReturnInventory() {
         // given
         final var inventory = createInventory(UUID.fromString("71737f0e-11eb-4775-b8b4-ce945fdee936"), OFFSET_DATE_TIME);
-        when(inventoryRepository.save(inventory)).thenReturn(inventory);
+        when(beerInventoryRepository.save(inventory)).thenReturn(inventory);
 
         // when
-        final var result = inventoryService.create(inventory);
+        final var result = beerInventoryService.create(inventory);
 
         // then
         assertEquals(inventory, result);
-        verify(inventoryRepository, times(1)).save(inventory);
+        verify(beerInventoryRepository, times(1)).save(inventory);
     }
 
     @Test
@@ -104,18 +103,18 @@ class InventoryServiceTest {
         final var updateRequest = getUpdateRequest(originalInventory);
         final var expectedInventory = getExpectedInventory(updateRequest, offsetDateTime);
 
-        when(inventoryRepository.findById(originalInventory.getId())).thenReturn(Optional.of(originalInventory));
-        when(inventoryRepository.save(any(Inventory.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(beerInventoryRepository.findById(originalInventory.getId())).thenReturn(Optional.of(originalInventory));
+        when(beerInventoryRepository.save(any(BeerInventory.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(dateTimeProvider.now()).thenReturn(offsetDateTime);
 
         // when
-        final var result = inventoryService.update(originalInventory.getId(), updateRequest);
+        final var result = beerInventoryService.update(originalInventory.getId(), updateRequest);
 
         // then
         assertEquals(expectedInventory, result);
         assertEquals(expectedInventory.getId(), result.getId());
-        verify(inventoryRepository, times(1)).findById(originalInventory.getId());
-        verify(inventoryRepository, times(1)).save(originalInventory);
+        verify(beerInventoryRepository, times(1)).findById(originalInventory.getId());
+        verify(beerInventoryRepository, times(1)).save(originalInventory);
     }
 
 
@@ -123,47 +122,47 @@ class InventoryServiceTest {
     void delete_ShouldDeleteInventory_WhenInventoryExists() {
         // given
         final var inventory = createInventory(UUID.fromString("71737f0e-11eb-4775-b8b4-ce945fdee936"), OFFSET_DATE_TIME);
-        when(inventoryRepository.findById(inventory.getId())).thenReturn(Optional.of(inventory));
-        doNothing().when(inventoryRepository).deleteById(inventory.getId());
+        when(beerInventoryRepository.findById(inventory.getId())).thenReturn(Optional.of(inventory));
+        doNothing().when(beerInventoryRepository).deleteById(inventory.getId());
 
         // when
-        assertDoesNotThrow(() -> inventoryService.delete(inventory.getId()));
+        assertDoesNotThrow(() -> beerInventoryService.delete(inventory.getId()));
 
         // then
-        verify(inventoryRepository, times(1)).findById(inventory.getId());
-        verify(inventoryRepository, times(1)).deleteById(inventory.getId());
+        verify(beerInventoryRepository, times(1)).findById(inventory.getId());
+        verify(beerInventoryRepository, times(1)).deleteById(inventory.getId());
     }
 
     @Test
     void delete_ShouldThrowException_WhenInventoryNotFound() {
         // given
         final var inventory = createInventory(UUID.fromString("71737f0e-11eb-4775-b8b4-ce945fdee936"), OFFSET_DATE_TIME);
-        when(inventoryRepository.findById(inventory.getId())).thenReturn(Optional.empty());
+        when(beerInventoryRepository.findById(inventory.getId())).thenReturn(Optional.empty());
 
         // when
-        assertThrows(InventoryNotFoundException.class, () -> inventoryService.delete(inventory.getId()));
+        assertThrows(BeerInventoryNotFoundException.class, () -> beerInventoryService.delete(inventory.getId()));
 
         // then
-        verify(inventoryRepository, times(1)).findById(inventory.getId());
-        verify(inventoryRepository, never()).deleteById(any());
+        verify(beerInventoryRepository, times(1)).findById(inventory.getId());
+        verify(beerInventoryRepository, never()).deleteById(any());
     }
 
-    private Inventory getUpdateRequest(Inventory originalInventory) {
+    private BeerInventory getUpdateRequest(BeerInventory originalBeerInventory) {
         return createInventory(
-                originalInventory.getId(),
+                originalBeerInventory.getId(),
                 OFFSET_DATE_TIME
         );
     }
 
-    private Inventory getExpectedInventory(Inventory originalInventory, OffsetDateTime offsetDateTime) {
+    private BeerInventory getExpectedInventory(BeerInventory originalBeerInventory, OffsetDateTime offsetDateTime) {
         return createInventory(
-                originalInventory.getId(),
+                originalBeerInventory.getId(),
                 offsetDateTime
         );
     }
 
-    private Inventory createInventory(UUID id, OffsetDateTime offsetDateTime) {
-        return Inventory.builder()
+    private BeerInventory createInventory(UUID id, OffsetDateTime offsetDateTime) {
+        return BeerInventory.builder()
                 .id(id)
                 .build();
     }

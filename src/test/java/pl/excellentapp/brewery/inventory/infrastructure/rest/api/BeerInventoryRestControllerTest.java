@@ -10,15 +10,14 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import pl.excellentapp.brewery.inventory.application.InventoryService;
-import pl.excellentapp.brewery.inventory.domain.Inventory;
-import pl.excellentapp.brewery.inventory.domain.exception.InventoryNotFoundException;
+import pl.excellentapp.brewery.inventory.application.BeerInventoryService;
+import pl.excellentapp.brewery.inventory.domain.beerinventory.BeerInventory;
+import pl.excellentapp.brewery.inventory.domain.exception.BeerInventoryNotFoundException;
 import pl.excellentapp.brewery.inventory.infrastructure.rest.api.dto.InventoryRequest;
 import pl.excellentapp.brewery.inventory.infrastructure.rest.api.dto.InventoryResponse;
 import pl.excellentapp.brewery.inventory.infrastructure.rest.api.dto.InventorysResponse;
 import pl.excellentapp.brewery.inventory.infrastructure.rest.api.mapper.InventoryRestMapper;
 
-import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -32,7 +31,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-class InventoryRestControllerTest extends AbstractMvcTest {
+class BeerInventoryRestControllerTest extends AbstractMvcTest {
 
     private static final OffsetDateTime OFFSET_DATE_TIME = OffsetDateTime.of(2025, 1, 23, 12, 7, 0, 0, ZoneOffset.UTC);
 
@@ -40,7 +39,7 @@ class InventoryRestControllerTest extends AbstractMvcTest {
     private InventoryRestController controller;
 
     @Mock
-    private InventoryService inventoryService;
+    private BeerInventoryService beerInventoryService;
 
     @Spy
     private InventoryRestMapper inventoryRestMapper = Mappers.getMapper(InventoryRestMapper.class);
@@ -64,7 +63,7 @@ class InventoryRestControllerTest extends AbstractMvcTest {
                 .andExpect(status().isOk());
 
         // then
-        verify(inventoryService).findAll();
+        verify(beerInventoryService).findAll();
     }
 
     @Test
@@ -72,7 +71,7 @@ class InventoryRestControllerTest extends AbstractMvcTest {
         // given
         final var inventory1 = createInventory(UUID.fromString("71737f0e-11eb-4775-b8b4-ce945fdee936"));
         final var inventory2 = createInventory(UUID.fromString("4a5b96de-684a-411b-9616-fddd0b06a382"));
-        when(inventoryService.findAll())
+        when(beerInventoryService.findAll())
                 .thenReturn(List.of(inventory1, inventory2));
 
         // when
@@ -96,7 +95,7 @@ class InventoryRestControllerTest extends AbstractMvcTest {
         final var inventoryResponse2 = inventorysResponseList.getLast();
         assertNotNull(inventoryResponse2);
         assertEquals(inventoryResponse2.getId(), inventory2.getId());
-        verify(inventoryService).findAll();
+        verify(beerInventoryService).findAll();
     }
 
     @Test
@@ -113,7 +112,7 @@ class InventoryRestControllerTest extends AbstractMvcTest {
         assertNotNull(response);
         final var responseBody = response.getContentAsString();
         assertNotNull(responseBody);
-        verify(inventoryService).findById(inventoryId);
+        verify(beerInventoryService).findById(inventoryId);
     }
 
     @Test
@@ -121,7 +120,7 @@ class InventoryRestControllerTest extends AbstractMvcTest {
         // given
         final var inventoryId = UUID.fromString("71737f0e-11eb-4775-b8b4-ce945fdee936");
         final var inventory = createInventory(inventoryId);
-        when(inventoryService.findById(inventoryId)).thenReturn(Optional.of(inventory));
+        when(beerInventoryService.findById(inventoryId)).thenReturn(Optional.of(inventory));
 
         // when
         final var response = mockMvc.perform(get("/api/v1/inventorys/" + inventoryId))
@@ -145,7 +144,7 @@ class InventoryRestControllerTest extends AbstractMvcTest {
         final var inventoryRequest = InventoryRequest.builder()
 
                 .build();
-        when(inventoryService.create(any())).thenReturn(inventory);
+        when(beerInventoryService.create(any())).thenReturn(inventory);
 
         // when
         final var response = mockMvc.perform(post("/api/v1/inventorys")
@@ -163,7 +162,7 @@ class InventoryRestControllerTest extends AbstractMvcTest {
         final var inventoryResponse = super.mapFromJson(responseBody, InventoryResponse.class);
         assertNotNull(inventoryResponse);
         assertEquals(inventoryResponse.getId(), inventory.getId());
-        verify(inventoryService).create(any());
+        verify(beerInventoryService).create(any());
     }
 
     @Test
@@ -176,7 +175,7 @@ class InventoryRestControllerTest extends AbstractMvcTest {
         final var inventoryRequest = InventoryRequest.builder()
 
                 .build();
-        when(inventoryService.update(any(), any())).thenReturn(expectedInventory);
+        when(beerInventoryService.update(any(), any())).thenReturn(expectedInventory);
 
         // when
         final var response = mockMvc.perform(put("/api/v1/inventorys/" + originalInventory.getId())
@@ -194,7 +193,7 @@ class InventoryRestControllerTest extends AbstractMvcTest {
         final var inventoryResponse = super.mapFromJson(responseBody, InventoryResponse.class);
         assertNotNull(inventoryResponse);
         assertEquals(inventoryResponse.getId(), expectedInventory.getId());
-        verify(inventoryService).update(any(), any());
+        verify(beerInventoryService).update(any(), any());
     }
 
     @Test
@@ -209,14 +208,14 @@ class InventoryRestControllerTest extends AbstractMvcTest {
                 .andExpect(status().isAccepted());
 
         // then
-        verify(inventoryService).delete(inventoryId);
+        verify(beerInventoryService).delete(inventoryId);
     }
 
     @Test
     void deleteInventory_ShouldThrowExceptionWhenTryDeletedInventory() throws Exception {
         // given
         final var inventoryId = UUID.fromString("71737f0e-11eb-4775-b8b4-ce945fdee936");
-        doThrow(new InventoryNotFoundException("Inventory Not Found. UUID: " + inventoryId)).when(inventoryService).delete(inventoryId);
+        doThrow(new BeerInventoryNotFoundException("Inventory Not Found. UUID: " + inventoryId)).when(beerInventoryService).delete(inventoryId);
 
         // when
         mockMvc.perform(delete("/api/v1/inventorys/" + inventoryId)
@@ -225,24 +224,24 @@ class InventoryRestControllerTest extends AbstractMvcTest {
                 .andExpect(status().isNotFound());
 
         // then
-        verify(inventoryService).delete(inventoryId);
+        verify(beerInventoryService).delete(inventoryId);
     }
 
-    private Inventory createInventory(UUID id) {
-        return Inventory.builder()
+    private BeerInventory createInventory(UUID id) {
+        return BeerInventory.builder()
                 .id(id)
                 .build();
     }
 
-    private Inventory getUpdateRequest(Inventory originalInventory) {
+    private BeerInventory getUpdateRequest(BeerInventory originalBeerInventory) {
         return createInventory(
-                originalInventory.getId()
+                originalBeerInventory.getId()
         );
     }
 
-    private Inventory getExpectedInventory(Inventory originalInventory, OffsetDateTime offsetDateTime) {
+    private BeerInventory getExpectedInventory(BeerInventory originalBeerInventory, OffsetDateTime offsetDateTime) {
         return createInventory(
-                originalInventory.getId()
+                originalBeerInventory.getId()
         );
     }
 }
