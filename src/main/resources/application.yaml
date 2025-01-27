@@ -14,3 +14,9 @@ spring:
   artemis:
     user: artemis-user
     password: artemis-password
+
+queue:
+  inventory:
+    add-stock: beer-inventory-add-stock
+    reserve-stock: beer-inventory-reserve-stock
+    release-stock: beer-inventory-release-stock
