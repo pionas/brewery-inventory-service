@@ -29,7 +29,7 @@ class InventoryRestController {
     private final InventoryRestMapper inventoryRestMapper;
 
     @GetMapping({"", "/"})
-    public ResponseEntity<InventoriesResponse> getInventorys() {
+    public ResponseEntity<InventoriesResponse> getInventories() {
         return new ResponseEntity<>(inventoryRestMapper.map(beerInventoryService.findAll()), HttpStatus.OK);
     }
 
