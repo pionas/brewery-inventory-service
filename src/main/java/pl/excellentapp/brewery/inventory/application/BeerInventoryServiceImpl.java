@@ -36,28 +36,28 @@ public class BeerInventoryServiceImpl implements BeerInventoryService {
         final var beerInventory = BeerInventory.builder()
                 .beerId(beerId)
                 .build();
-        beerInventory.addStock(availableStock, dateTimeProvider.now().toLocalDateTime());
+        beerInventory.addStock(availableStock, dateTimeProvider.now());
         return beerInventoryRepository.save(beerInventory);
     }
 
     @Override
     public BeerInventory addStock(UUID beerId, int quantity) {
         final var beerInventory = getInventoryById(beerId);
-        beerInventory.addStock(quantity, dateTimeProvider.now().toLocalDateTime());
+        beerInventory.addStock(quantity, dateTimeProvider.now());
         return beerInventoryRepository.save(beerInventory);
     }
 
     @Override
     public BeerInventory reserveStock(UUID beerId, int quantity) {
         final var beerInventory = getInventoryById(beerId);
-        beerInventory.reserveStock(quantity, dateTimeProvider.now().toLocalDateTime());
+        beerInventory.reserveStock(quantity, dateTimeProvider.now());
         return beerInventoryRepository.save(beerInventory);
     }
 
     @Override
     public BeerInventory releaseStock(UUID beerId, int quantity) {
         final var beerInventory = getInventoryById(beerId);
-        beerInventory.releaseStock(quantity, dateTimeProvider.now().toLocalDateTime());
+        beerInventory.releaseStock(quantity, dateTimeProvider.now());
         return beerInventoryRepository.save(beerInventory);
     }
 

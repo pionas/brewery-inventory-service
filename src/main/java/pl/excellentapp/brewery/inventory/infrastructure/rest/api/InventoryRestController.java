@@ -15,7 +15,7 @@ import pl.excellentapp.brewery.inventory.application.BeerInventoryService;
 import pl.excellentapp.brewery.inventory.infrastructure.rest.api.dto.InventoryRequest;
 import pl.excellentapp.brewery.inventory.infrastructure.rest.api.dto.InventoryResponse;
 import pl.excellentapp.brewery.inventory.infrastructure.rest.api.dto.InventoryStockRequest;
-import pl.excellentapp.brewery.inventory.infrastructure.rest.api.dto.InventorysResponse;
+import pl.excellentapp.brewery.inventory.infrastructure.rest.api.dto.InventoriesResponse;
 import pl.excellentapp.brewery.inventory.infrastructure.rest.api.mapper.InventoryRestMapper;
 
 import java.util.UUID;
@@ -29,7 +29,7 @@ class InventoryRestController {
     private final InventoryRestMapper inventoryRestMapper;
 
     @GetMapping({"", "/"})
-    public ResponseEntity<InventorysResponse> getInventorys() {
+    public ResponseEntity<InventoriesResponse> getInventorys() {
         return new ResponseEntity<>(inventoryRestMapper.map(beerInventoryService.findAll()), HttpStatus.OK);
     }
 

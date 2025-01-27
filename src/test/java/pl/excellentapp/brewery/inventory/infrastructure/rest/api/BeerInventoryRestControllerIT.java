@@ -8,12 +8,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.jdbc.JdbcTestUtils;
+import pl.excellentapp.brewery.inventory.infrastructure.rest.api.dto.InventoriesResponse;
+import pl.excellentapp.brewery.inventory.infrastructure.rest.api.dto.InventoryRequest;
 import pl.excellentapp.brewery.inventory.infrastructure.rest.api.dto.InventoryResponse;
-import pl.excellentapp.brewery.inventory.infrastructure.rest.api.dto.InventorysResponse;
+import pl.excellentapp.brewery.inventory.infrastructure.rest.api.dto.InventoryStockRequest;
 
-import java.math.BigDecimal;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.Map;
 import java.util.UUID;
 
@@ -21,70 +20,164 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class BeerInventoryRestControllerIT extends AbstractIT {
 
-    private final String MODEL_API_URL = "/api/v1/inventorys";
+    private final String MODEL_API_URL = "/api/v1/inventories";
+    private final String INVENTORY_DETAILS_API_URL = "/api/v1/inventories/{inventoryId}";
 
     @AfterEach
     void clearDatabase(@Autowired JdbcTemplate jdbcTemplate) {
-        JdbcTestUtils.deleteFromTables(jdbcTemplate, "inventorys");
+        JdbcTestUtils.deleteFromTables(jdbcTemplate, "beer_inventory_history", "beer_inventory");
     }
 
     @Test
-    void getInventorys_ShouldReturnEmptyListOfInventorys() {
+    void shouldReturnEmptyListOfInventories() {
         // given
 
         // when
-        final var response = restTemplate.getForEntity(MODEL_API_URL, InventorysResponse.class);
+        final var response = restTemplate.getForEntity(MODEL_API_URL, InventoriesResponse.class);
 
         // then
         assertEquals(HttpStatus.OK, response.getStatusCode());
         final var responseBody = response.getBody();
         assertNotNull(responseBody);
-        final var inventorysResponse = responseBody.getInventorys();
-        assertNotNull(inventorysResponse);
-        assertTrue(inventorysResponse.isEmpty());
+        final var inventoriesResponse = responseBody.getInventories();
+        assertNotNull(inventoriesResponse);
+        assertTrue(inventoriesResponse.isEmpty());
     }
 
     @Test
-    @Sql({"/db/inventorys.sql"})
-    void getInventorys_ShouldReturnListOfInventorys() {
+    @Sql({"/db/inventories.sql"})
+    void shouldReturnListOfInventories() {
         // given
 
         // when
-        final var response = restTemplate.getForEntity(MODEL_API_URL, InventorysResponse.class);
+        final var response = restTemplate.getForEntity(MODEL_API_URL, InventoriesResponse.class);
 
         // then
         assertEquals(HttpStatus.OK, response.getStatusCode());
         final var responseBody = response.getBody();
         assertNotNull(responseBody);
-        final var inventorysResponse = responseBody.getInventorys();
-        assertNotNull(inventorysResponse);
-        assertFalse(inventorysResponse.isEmpty());
+        final var inventoriesResponse = responseBody.getInventories();
+        assertNotNull(inventoriesResponse);
+        assertFalse(inventoriesResponse.isEmpty());
     }
 
     @Test
-    @Sql({"/db/inventorys.sql"})
-    void getInventory_ShouldReturnInventory() {
+    @Sql({"/db/inventories.sql"})
+    void shouldReturnInventory() {
         // given
-        final var inventoryId = UUID.fromString("1b4e28ba-2fa1-4d3b-a3f5-ef19b5a7633b");
+        final var inventoryId = UUID.fromString("b1d1a20e-fb93-4c38-b0f7-9ac1f28e03c1");
 
         // when
-        final var response = restTemplate.getForEntity(MODEL_API_URL + "/{inventoryId}", InventoryResponse.class, inventoryId);
+        final var response = restTemplate.getForEntity(INVENTORY_DETAILS_API_URL, InventoryResponse.class, inventoryId);
 
         // then
         assertEquals(HttpStatus.OK, response.getStatusCode());
         final var responseBody = response.getBody();
         assertNotNull(responseBody);
         assertEquals(inventoryId, responseBody.getId());
+        assertEquals(20, responseBody.getAvailableStock());
     }
 
     @Test
-    void deleteInventory_ShouldThrowException() {
+    void shouldThrowNotFoundWhenTryGetInventoryButInventoryByIdNotExists() {
+        // given
+        final var inventoryId = UUID.fromString("b1d1a20e-fb93-4c38-b0f7-9ac1f28e03c1");
+
+        // when
+        final var response = restTemplate.getForEntity(INVENTORY_DETAILS_API_URL, InventoryResponse.class, inventoryId);
+
+        // then
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    void shouldCreateInventory() {
+        // given
+        final var inventoryId = UUID.fromString("1337b641-30b2-4dcd-b4d7-e64dbedece61");
+        final var inventoryRequest = InventoryRequest.builder()
+                .beerId(inventoryId)
+                .availableStock(20)
+                .build();
+
+        // when
+        final var response = restTemplate.postForEntity(MODEL_API_URL, inventoryRequest, InventoryResponse.class);
+
+        // then
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        final var responseBody = response.getBody();
+        assertNotNull(responseBody);
+        assertEquals(inventoryId, responseBody.getId());
+        assertEquals(20, responseBody.getAvailableStock());
+    }
+
+    @Test
+    @Sql({"/db/inventories.sql"})
+    void shouldAddStockInventory() {
+        // given
+        final var inventoryId = UUID.fromString("b1d1a20e-fb93-4c38-b0f7-9ac1f28e03c1");
+        final var stockRequest = InventoryStockRequest.builder()
+                .stock(20)
+                .build();
+
+        // when
+        final var response = restTemplate.postForEntity(INVENTORY_DETAILS_API_URL + "/add-stock", stockRequest, InventoryResponse.class, inventoryId);
+
+        // then
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        final var responseBody = response.getBody();
+        assertNotNull(responseBody);
+        assertEquals(inventoryId, responseBody.getId());
+        assertEquals(40, responseBody.getAvailableStock());
+    }
+
+    @Test
+    @Sql({"/db/inventories.sql"})
+    void shouldReserveStockInventory() {
+        // given
+        final var inventoryId = UUID.fromString("f395b3c2-6468-4d81-a87a-2db89c23ae14");
+        final var stockRequest = InventoryStockRequest.builder()
+                .stock(15)
+                .build();
+
+        // when
+        final var response = restTemplate.postForEntity(INVENTORY_DETAILS_API_URL + "/reserve-stock", stockRequest, InventoryResponse.class, inventoryId);
+
+        // then
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        final var responseBody = response.getBody();
+        assertNotNull(responseBody);
+        assertEquals(inventoryId, responseBody.getId());
+        assertEquals(85, responseBody.getAvailableStock());
+    }
+
+    @Test
+    @Sql({"/db/inventories.sql"})
+    void shouldReleaseStockInventory() {
+        // given
+        final var inventoryId = UUID.fromString("2e9f64d8-4bf2-4e5e-beb8-8a0e2f5d3a7a");
+        final var stockRequest = InventoryStockRequest.builder()
+                .stock(20)
+                .build();
+
+        // when
+        final var response = restTemplate.postForEntity(INVENTORY_DETAILS_API_URL + "/release-stock", stockRequest, InventoryResponse.class, inventoryId);
+
+        // then
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        final var responseBody = response.getBody();
+        assertNotNull(responseBody);
+        assertEquals(inventoryId, responseBody.getId());
+        assertEquals(20, responseBody.getAvailableStock());
+    }
+
+    @Test
+    void shouldThrowNotFoundWhenTryDeleteInventoryButInventoryByIdNotExists() {
         // given
         final var inventoryId = UUID.fromString("1b4e28ba-2fa1-4d3b-a3f5-ef19b5a7633b");
 
         // when
         final var response = restTemplate.exchange(
-                MODEL_API_URL + "/{inventoryId}",
+                INVENTORY_DETAILS_API_URL,
                 HttpMethod.DELETE,
                 null,
                 Map.class,
@@ -96,14 +189,14 @@ class BeerInventoryRestControllerIT extends AbstractIT {
     }
 
     @Test
-    @Sql({"/db/inventorys.sql"})
-    void deleteInventory_ShouldDelete() {
+    @Sql({"/db/inventories.sql"})
+    void shouldDeleteById() {
         // given
-        final var inventoryId = UUID.fromString("1b4e28ba-2fa1-4d3b-a3f5-ef19b5a7633b");
+        final var inventoryId = UUID.fromString("b1d1a20e-fb93-4c38-b0f7-9ac1f28e03c1");
 
         // when
         final var response = restTemplate.exchange(
-                MODEL_API_URL + "/{inventoryId}",
+                INVENTORY_DETAILS_API_URL,
                 HttpMethod.DELETE,
                 null,
                 Void.class,
@@ -112,8 +205,8 @@ class BeerInventoryRestControllerIT extends AbstractIT {
 
         // then
         assertEquals(HttpStatus.ACCEPTED, response.getStatusCode());
-        final var responseVerify = restTemplate.getForEntity(MODEL_API_URL + "/{inventoryId}", InventoryResponse.class, inventoryId);
-        assertEquals(HttpStatus.OK, responseVerify.getStatusCode());
+        final var responseVerify = restTemplate.getForEntity(INVENTORY_DETAILS_API_URL, InventoryResponse.class, inventoryId);
+        assertEquals(HttpStatus.NOT_FOUND, responseVerify.getStatusCode());
     }
 
 }

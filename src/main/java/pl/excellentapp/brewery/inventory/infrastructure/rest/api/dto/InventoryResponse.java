@@ -14,4 +14,5 @@ import java.util.UUID;
 public class InventoryResponse {
 
     private UUID id;
+    private int availableStock;
 }

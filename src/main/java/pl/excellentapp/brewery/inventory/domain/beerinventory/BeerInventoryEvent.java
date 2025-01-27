@@ -2,13 +2,17 @@ package pl.excellentapp.brewery.inventory.domain.beerinventory;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode(exclude = "beerInventory")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

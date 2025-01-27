@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class InventorysResponse {
+public class InventoriesResponse {
 
-    private List<InventoryResponse> inventorys;
+    private List<InventoryResponse> inventories;
 }

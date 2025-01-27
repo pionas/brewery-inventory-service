@@ -5,7 +5,7 @@ import org.mapstruct.Mapping;
 import pl.excellentapp.brewery.inventory.domain.beerinventory.BeerInventory;
 import pl.excellentapp.brewery.inventory.infrastructure.rest.api.dto.InventoryRequest;
 import pl.excellentapp.brewery.inventory.infrastructure.rest.api.dto.InventoryResponse;
-import pl.excellentapp.brewery.inventory.infrastructure.rest.api.dto.InventorysResponse;
+import pl.excellentapp.brewery.inventory.infrastructure.rest.api.dto.InventoriesResponse;
 
 import java.util.List;
 
@@ -19,9 +19,9 @@ public interface InventoryRestMapper {
 
     List<InventoryResponse> mapInventories(List<BeerInventory> all);
 
-    default InventorysResponse map(List<BeerInventory> all) {
-        return InventorysResponse.builder()
-                .inventorys(mapInventories(all))
+    default InventoriesResponse map(List<BeerInventory> all) {
+        return InventoriesResponse.builder()
+                .inventories(mapInventories(all))
                 .build();
     }
 }
