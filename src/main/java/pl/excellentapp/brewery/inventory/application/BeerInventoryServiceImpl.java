@@ -2,6 +2,7 @@ package pl.excellentapp.brewery.inventory.application;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.excellentapp.brewery.inventory.domain.beerinventory.BeerInventory;
 import pl.excellentapp.brewery.inventory.domain.beerinventory.BeerInventoryRepository;
 import pl.excellentapp.brewery.inventory.domain.exception.BeerInventoryNotFoundException;
@@ -33,21 +34,21 @@ public class BeerInventoryServiceImpl implements BeerInventoryService {
         if (beerInventoryRepository.findById(beerId).isPresent()) {
             throw new IllegalStateException("Beer inventory exists");
         }
-        final var beerInventory = BeerInventory.builder()
-                .beerId(beerId)
-                .build();
+        final var beerInventory = getBeerInventory(beerId);
         beerInventory.addStock(availableStock, dateTimeProvider.now());
         return beerInventoryRepository.save(beerInventory);
     }
 
     @Override
+    @Transactional
     public BeerInventory addStock(UUID beerId, int quantity) {
-        final var beerInventory = getInventoryById(beerId);
+        final var beerInventory = beerInventoryRepository.findById(beerId).orElseGet(() -> getBeerInventory(beerId));
         beerInventory.addStock(quantity, dateTimeProvider.now());
         return beerInventoryRepository.save(beerInventory);
     }
 
     @Override
+    @Transactional
     public BeerInventory reserveStock(UUID beerId, int quantity) {
         final var beerInventory = getInventoryById(beerId);
         beerInventory.reserveStock(quantity, dateTimeProvider.now());
@@ -55,6 +56,7 @@ public class BeerInventoryServiceImpl implements BeerInventoryService {
     }
 
     @Override
+    @Transactional
     public BeerInventory releaseStock(UUID beerId, int quantity) {
         final var beerInventory = getInventoryById(beerId);
         beerInventory.releaseStock(quantity, dateTimeProvider.now());
@@ -70,5 +72,11 @@ public class BeerInventoryServiceImpl implements BeerInventoryService {
     private BeerInventory getInventoryById(UUID inventoryId) {
         return beerInventoryRepository.findById(inventoryId)
                 .orElseThrow(() -> new BeerInventoryNotFoundException("Inventory Not Found. UUID: " + inventoryId));
+    }
+
+    private BeerInventory getBeerInventory(UUID beerId) {
+        return BeerInventory.builder()
+                .beerId(beerId)
+                .build();
     }
 }
