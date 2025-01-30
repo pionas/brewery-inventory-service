@@ -1,4 +1,4 @@
-package pl.excellentapp.brewery.beer.events;
+package pl.excellentapp.brewery.common.events;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
