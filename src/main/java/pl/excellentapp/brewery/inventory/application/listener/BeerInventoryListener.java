@@ -8,6 +8,7 @@ import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
+import pl.excellentapp.brewery.beer.events.BeerInventoryEvent;
 import pl.excellentapp.brewery.inventory.application.BeerInventoryService;
 
 import java.util.UUID;
