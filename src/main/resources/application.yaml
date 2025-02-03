@@ -20,6 +20,8 @@ queue:
     add-stock: beer-inventory-add-stock
     reserve-stock: beer-inventory-reserve-stock
     release-stock: beer-inventory-release-stock
+  order:
+    allocate-response: beer-order-allocate-response
 
 server:
   port: 8081

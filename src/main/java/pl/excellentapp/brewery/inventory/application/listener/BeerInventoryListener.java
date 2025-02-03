@@ -1,67 +1,70 @@
 package pl.excellentapp.brewery.inventory.application.listener;
 
-import jakarta.jms.JMSException;
-import jakarta.jms.Message;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
-import pl.excellentapp.brewery.model.events.BeerInventoryEvent;
 import pl.excellentapp.brewery.inventory.application.BeerInventoryService;
+import pl.excellentapp.brewery.model.events.BeerInventoryEvent;
+import pl.excellentapp.brewery.model.events.BeerInventoryEventResponse;
 
 import java.util.UUID;
 import java.util.function.BiConsumer;
 
-@RequiredArgsConstructor
 @Component
 @Slf4j
 class BeerInventoryListener {
 
     private final JmsTemplate jmsTemplate;
     private final BeerInventoryService beerInventoryService;
+    private final String allocateOrderResponseQueueName;
+
+    public BeerInventoryListener(BeerInventoryService beerInventoryService, JmsTemplate jmsTemplate, @Value("${queue.order.allocate-response}") String allocateOrderResponseQueueName) {
+        this.beerInventoryService = beerInventoryService;
+        this.jmsTemplate = jmsTemplate;
+        this.allocateOrderResponseQueueName = allocateOrderResponseQueueName;
+    }
+
 
     @JmsListener(destination = "${queue.inventory.add-stock}")
-    public void addStock(@Payload BeerInventoryEvent beerInventoryEvent,
-                         Message jmsMessage) throws JMSException {
+    public void addStock(@Payload BeerInventoryEvent beerInventoryEvent) {
         processStockOperation(
                 beerInventoryEvent,
-                jmsMessage,
                 beerInventoryService::addStock
         );
     }
 
     @JmsListener(destination = "${queue.inventory.reserve-stock}")
-    public void reserveStock(@Payload BeerInventoryEvent beerInventoryEvent,
-                             Message jmsMessage) throws JMSException {
+    public void reserveStock(@Payload BeerInventoryEvent beerInventoryEvent) {
         processStockOperation(
                 beerInventoryEvent,
-                jmsMessage,
                 beerInventoryService::reserveStock
         );
     }
 
     @JmsListener(destination = "${queue.inventory.release-stock}")
-    public void releaseStock(@Payload BeerInventoryEvent beerInventoryEvent,
-                             Message jmsMessage) throws JMSException {
+    public void releaseStock(@Payload BeerInventoryEvent beerInventoryEvent) {
         processStockOperation(
                 beerInventoryEvent,
-                jmsMessage,
                 beerInventoryService::releaseStock
         );
     }
 
     private void processStockOperation(BeerInventoryEvent beerInventoryEvent,
-                                       Message jmsMessage,
-                                       BiConsumer<UUID, Integer> stockOperation) throws JMSException {
-        final var responseEvent = new BeerInventoryEventResponse();
+                                       BiConsumer<UUID, Integer> stockOperation) {
+        final var responseEvent = BeerInventoryEventResponse.builder()
+                .orderId(beerInventoryEvent.getOrderId())
+                .beerId(beerInventoryEvent.getBeerId())
+                .stock(beerInventoryEvent.getStock());
         try {
             stockOperation.accept(beerInventoryEvent.getBeerId(), beerInventoryEvent.getStock());
-            responseEvent.success();
+            responseEvent.success(true);
         } catch (Exception e) {
-            responseEvent.failed(e.getMessage());
+            responseEvent.success(false);
+            responseEvent.message(e.getMessage());
         }
-        jmsTemplate.convertAndSend(jmsMessage.getJMSReplyTo(), responseEvent);
+        jmsTemplate.convertAndSend(allocateOrderResponseQueueName, responseEvent.build());
     }
 }

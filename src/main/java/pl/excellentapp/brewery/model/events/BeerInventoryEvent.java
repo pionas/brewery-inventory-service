@@ -13,6 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class BeerInventoryEvent {
 
+    private UUID orderId;
     private UUID beerId;
     private Integer stock;
 }
