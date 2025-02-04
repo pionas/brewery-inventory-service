@@ -18,10 +18,9 @@ spring:
 queue:
   inventory:
     add-stock: beer-inventory-add-stock
-    reserve-stock: beer-inventory-reserve-stock
-    release-stock: beer-inventory-release-stock
-  order:
-    allocate-response: beer-order-allocate-response
+    allocate-stock: beer-inventory-allocate-stock
+    allocate-failure: beer-inventory-allocate-failure
+    allocate-response: beer-inventory-allocate-response
 
 server:
   port: 8081

@@ -21,7 +21,7 @@ class BeerInventoryListener {
     private final BeerInventoryService beerInventoryService;
     private final String allocateOrderResponseQueueName;
 
-    public BeerInventoryListener(BeerInventoryService beerInventoryService, JmsTemplate jmsTemplate, @Value("${queue.order.allocate-response}") String allocateOrderResponseQueueName) {
+    public BeerInventoryListener(BeerInventoryService beerInventoryService, JmsTemplate jmsTemplate, @Value("${queue.inventory.allocate-response}") String allocateOrderResponseQueueName) {
         this.beerInventoryService = beerInventoryService;
         this.jmsTemplate = jmsTemplate;
         this.allocateOrderResponseQueueName = allocateOrderResponseQueueName;
@@ -36,7 +36,7 @@ class BeerInventoryListener {
         );
     }
 
-    @JmsListener(destination = "${queue.inventory.reserve-stock}")
+    @JmsListener(destination = "${queue.inventory.allocate-stock}")
     public void reserveStock(@Payload BeerInventoryEvent beerInventoryEvent) {
         processStockOperation(
                 beerInventoryEvent,
@@ -44,7 +44,7 @@ class BeerInventoryListener {
         );
     }
 
-    @JmsListener(destination = "${queue.inventory.release-stock}")
+    @JmsListener(destination = "${queue.inventory.allocate-failure}")
     public void releaseStock(@Payload BeerInventoryEvent beerInventoryEvent) {
         processStockOperation(
                 beerInventoryEvent,

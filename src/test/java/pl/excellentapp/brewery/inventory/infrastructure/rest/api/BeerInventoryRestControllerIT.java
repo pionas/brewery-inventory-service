@@ -140,7 +140,7 @@ class BeerInventoryRestControllerIT extends AbstractIT {
                 .build();
 
         // when
-        final var response = restTemplate.postForEntity(INVENTORY_DETAILS_API_URL + "/reserve-stock", stockRequest, InventoryResponse.class, inventoryId);
+        final var response = restTemplate.postForEntity(INVENTORY_DETAILS_API_URL + "/allocate-stock", stockRequest, InventoryResponse.class, inventoryId);
 
         // then
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -160,7 +160,7 @@ class BeerInventoryRestControllerIT extends AbstractIT {
                 .build();
 
         // when
-        final var response = restTemplate.postForEntity(INVENTORY_DETAILS_API_URL + "/release-stock", stockRequest, InventoryResponse.class, inventoryId);
+        final var response = restTemplate.postForEntity(INVENTORY_DETAILS_API_URL + "/allocate-failure", stockRequest, InventoryResponse.class, inventoryId);
 
         // then
         assertEquals(HttpStatus.OK, response.getStatusCode());

@@ -54,13 +54,13 @@ class InventoryRestController {
         return new ResponseEntity<>(inventoryResponse, HttpStatus.OK);
     }
 
-    @PostMapping("/{beerId}/reserve-stock")
+    @PostMapping("/{beerId}/allocate-stock")
     public ResponseEntity<InventoryResponse> reserveStock(@PathVariable("beerId") UUID beerId, @Valid @RequestBody InventoryStockRequest inventoryStockRequest) {
         final var inventoryResponse = inventoryRestMapper.map(beerInventoryService.reserveStock(beerId, inventoryStockRequest.getStock()));
         return new ResponseEntity<>(inventoryResponse, HttpStatus.OK);
     }
 
-    @PostMapping("/{beerId}/release-stock")
+    @PostMapping("/{beerId}/allocate-failure")
     public ResponseEntity<InventoryResponse> releaseStock(@PathVariable("beerId") UUID beerId, @Valid @RequestBody InventoryStockRequest inventoryStockRequest) {
         final var inventoryResponse = inventoryRestMapper.map(beerInventoryService.releaseStock(beerId, inventoryStockRequest.getStock()));
         return new ResponseEntity<>(inventoryResponse, HttpStatus.OK);
