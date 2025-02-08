@@ -44,7 +44,7 @@ class BeerInventoryListener {
         );
     }
 
-    @JmsListener(destination = "${queue.inventory.allocate-failure}")
+    @JmsListener(destination = "${queue.inventory.deallocate-stock}")
     public void releaseStock(@Payload BeerInventoryEvent beerInventoryEvent) {
         processStockOperation(
                 beerInventoryEvent,
