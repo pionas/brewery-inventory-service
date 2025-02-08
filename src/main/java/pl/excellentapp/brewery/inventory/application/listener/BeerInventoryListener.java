@@ -55,11 +55,9 @@ class BeerInventoryListener {
     private void processStockOperation(BeerInventoryEvent beerInventoryEvent,
                                        BiConsumer<UUID, Integer> stockOperation) {
         final var responseEvent = BeerInventoryEventResponse.builder()
-                .orderId(beerInventoryEvent.getOrderId())
-                .beerId(beerInventoryEvent.getBeerId())
-                .stock(beerInventoryEvent.getStock());
+                .orderId(beerInventoryEvent.getOrderId());
         try {
-            stockOperation.accept(beerInventoryEvent.getBeerId(), beerInventoryEvent.getStock());
+            beerInventoryEvent.getBeers().forEach(stockOperation);
             responseEvent.success(true);
         } catch (Exception e) {
             responseEvent.success(false);

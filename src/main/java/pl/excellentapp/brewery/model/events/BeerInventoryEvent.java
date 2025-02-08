@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Builder
@@ -14,6 +16,5 @@ import java.util.UUID;
 public class BeerInventoryEvent {
 
     private UUID orderId;
-    private UUID beerId;
-    private Integer stock;
+    private Map<UUID, Integer> beers = new HashMap<>();
 }
