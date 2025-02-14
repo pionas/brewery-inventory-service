@@ -19,7 +19,7 @@ queue:
   inventory:
     add-stock: beer-inventory-add-stock
     allocate-stock: beer-inventory-allocate-stock
-    allocate-failure: beer-inventory-allocate-failure
+    deallocate-stock: beer-inventory-deallocate-stock
     allocate-response: beer-inventory-allocate-response
 
 server:
