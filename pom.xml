@@ -7,7 +7,7 @@
     <parent>
         <groupId>pl.excellentapp.brewery.boot</groupId>
         <artifactId>brewery-parent</artifactId>
-        <version>1.0</version>
+        <version>1.0.2</version>
     </parent>
 
     <groupId>pl.excellentapp.brewery.inventory</groupId>
@@ -63,38 +63,26 @@
     </dependencies>
 
     <build>
-        <plugins>
-            <plugin>
-                <groupId>org.pitest</groupId>
-                <artifactId>pitest-maven</artifactId>
-                <version>1.17.4</version>
-                <executions>
-                    <execution>
-                        <id>pitest-mutation-coverage</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>scmMutationCoverage</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.pitest</groupId>
-                        <artifactId>pitest-junit5-plugin</artifactId>
-                        <version>1.2.1</version>
-                    </dependency>
-                </dependencies>
-                <configuration>
-                    <outputFormats>
-                        <format>XML</format>
-                        <format>HTML</format>
-                    </outputFormats>
-                    <excludedClasses>
-                        <param>pl.excellentapp.brewery.inventory.**.*Mapper*</param>
-                    </excludedClasses>
-                </configuration>
-            </plugin>
-        </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.pitest</groupId>
+                    <artifactId>pitest-maven</artifactId>
+                    <configuration>
+                        <targetClasses>
+                            <param>pl.excellentapp.brewery.inventory.*</param>
+                        </targetClasses>
+                        <targetTests>
+                            <param>pl.excellentapp.brewery.inventory.*</param>
+                        </targetTests>
+                        <excludedClasses>
+                            <param>pl.excellentapp.brewery.inventory.**.*Mapper*</param>
+                            <param>pl.excellentapp.brewery.inventory.**.*Configuration*</param>
+                        </excludedClasses>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
 
 </project>
