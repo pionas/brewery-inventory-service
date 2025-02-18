@@ -9,7 +9,8 @@ import pl.excellentapp.brewery.inventory.domain.exception.BeerInsufficientStockE
 import pl.excellentapp.brewery.inventory.domain.exception.BeerInventoryNotFoundException;
 import pl.excellentapp.brewery.inventory.utils.DateTimeProvider;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -20,7 +21,7 @@ import static org.mockito.Mockito.*;
 
 class BeerInventoryServiceTest {
 
-    private static final LocalDateTime LOCAL_DATE_TIME = LocalDateTime.of(2025, 1, 23, 12, 7, 0, 0);
+    private static final OffsetDateTime OFFSET_DATE_TIME = OffsetDateTime.of(2025, 1, 23, 12, 7, 0, 0, ZoneOffset.UTC);
 
     private final BeerInventoryRepository beerInventoryRepository = Mockito.mock(BeerInventoryRepository.class);
     private final DateTimeProvider dateTimeProvider = Mockito.mock(DateTimeProvider.class);
@@ -31,16 +32,16 @@ class BeerInventoryServiceTest {
     void shouldReturnListOfInventories() {
         // given
         final var inventories = List.of(
-                createBeerInventory(UUID.fromString("1b4e28ba-2fa1-4d3b-a3f5-ef19b5a7633b"), 1, LOCAL_DATE_TIME),
-                createBeerInventory(UUID.fromString("2c4f2ed6-bd1d-4f9d-82c6-6b975b5cf5b3"), 1, LOCAL_DATE_TIME),
-                createBeerInventory(UUID.fromString("3a8e0e2f-587d-4b3c-b1c9-27f5d6c3627a"), 1, LOCAL_DATE_TIME),
-                createBeerInventory(UUID.fromString("4c9e7a3b-84e7-4f8e-95e2-cd2f1d56e6b7"), 1, LOCAL_DATE_TIME),
-                createBeerInventory(UUID.fromString("5d3f8e7c-9f2b-42e1-908d-cf3d1e678e9b"), 1, LOCAL_DATE_TIME),
-                createBeerInventory(UUID.fromString("6e8f9d4c-7c8a-45d1-8b4c-ed3f5a7b6e9d"), 1, LOCAL_DATE_TIME),
-                createBeerInventory(UUID.fromString("7f1b3c2d-8e9f-41b2-94c8-ef3d7a6b5c9f"), 1, LOCAL_DATE_TIME),
-                createBeerInventory(UUID.fromString("8a2d4e6f-9b3c-4e2f-b7d1-2c3f5a8e7b6d"), 1, LOCAL_DATE_TIME),
-                createBeerInventory(UUID.fromString("9c3e5d7a-b8f2-41c3-82e9-f2b1d6e5c4f7"), 1, LOCAL_DATE_TIME),
-                createBeerInventory(UUID.fromString("0d1e2f3b-5a7c-4d1f-8e9b-2f3d6a8b7c5f"), 1, LOCAL_DATE_TIME)
+                createBeerInventory(UUID.fromString("1b4e28ba-2fa1-4d3b-a3f5-ef19b5a7633b"), 1),
+                createBeerInventory(UUID.fromString("2c4f2ed6-bd1d-4f9d-82c6-6b975b5cf5b3"), 1),
+                createBeerInventory(UUID.fromString("3a8e0e2f-587d-4b3c-b1c9-27f5d6c3627a"), 1),
+                createBeerInventory(UUID.fromString("4c9e7a3b-84e7-4f8e-95e2-cd2f1d56e6b7"), 1),
+                createBeerInventory(UUID.fromString("5d3f8e7c-9f2b-42e1-908d-cf3d1e678e9b"), 1),
+                createBeerInventory(UUID.fromString("6e8f9d4c-7c8a-45d1-8b4c-ed3f5a7b6e9d"), 1),
+                createBeerInventory(UUID.fromString("7f1b3c2d-8e9f-41b2-94c8-ef3d7a6b5c9f"), 1),
+                createBeerInventory(UUID.fromString("8a2d4e6f-9b3c-4e2f-b7d1-2c3f5a8e7b6d"), 1),
+                createBeerInventory(UUID.fromString("9c3e5d7a-b8f2-41c3-82e9-f2b1d6e5c4f7"), 1),
+                createBeerInventory(UUID.fromString("0d1e2f3b-5a7c-4d1f-8e9b-2f3d6a8b7c5f"), 1)
         );
         when(beerInventoryRepository.findAll()).thenReturn(inventories);
 
@@ -69,7 +70,7 @@ class BeerInventoryServiceTest {
     @Test
     void shouldReturnInventoryWhenInventoryByIdExists() {
         // given
-        final var inventory = createBeerInventory(UUID.fromString("71737f0e-11eb-4775-b8b4-ce945fdee936"), 1, LOCAL_DATE_TIME);
+        final var inventory = createBeerInventory(UUID.fromString("71737f0e-11eb-4775-b8b4-ce945fdee936"), 1);
         when(beerInventoryRepository.findById(inventory.getBeerId())).thenReturn(Optional.of(inventory));
 
         // when
@@ -84,7 +85,7 @@ class BeerInventoryServiceTest {
     @Test
     void shouldReturnEmptyWhenInventoryByIdNotFound() {
         // given
-        final var inventory = createBeerInventory(UUID.fromString("71737f0e-11eb-4775-b8b4-ce945fdee936"), 2, LOCAL_DATE_TIME);
+        final var inventory = createBeerInventory(UUID.fromString("71737f0e-11eb-4775-b8b4-ce945fdee936"), 2);
         when(beerInventoryRepository.findById(inventory.getBeerId())).thenReturn(Optional.empty());
 
         // when
@@ -98,9 +99,9 @@ class BeerInventoryServiceTest {
     @Test
     void shouldSaveAndReturnInventory() {
         // given
-        final var inventory = createBeerInventory(UUID.fromString("71737f0e-11eb-4775-b8b4-ce945fdee936"), 3, LOCAL_DATE_TIME);
+        final var inventory = createBeerInventory(UUID.fromString("71737f0e-11eb-4775-b8b4-ce945fdee936"), 3);
         when(beerInventoryRepository.save(inventory)).thenReturn(inventory);
-        when(dateTimeProvider.now()).thenReturn(LOCAL_DATE_TIME);
+        when(dateTimeProvider.now()).thenReturn(OFFSET_DATE_TIME);
 
         // when
         final var result = beerInventoryService.create(inventory.getBeerId(), inventory.getAvailableStock());
@@ -113,10 +114,10 @@ class BeerInventoryServiceTest {
     @Test
     void shouldAddStockAndReturnInventory() {
         // given
-        final var inventory = createBeerInventory(UUID.fromString("71737f0e-11eb-4775-b8b4-ce945fdee936"), 3, LOCAL_DATE_TIME);
+        final var inventory = createBeerInventory(UUID.fromString("71737f0e-11eb-4775-b8b4-ce945fdee936"), 3);
         when(beerInventoryRepository.findById(inventory.getBeerId())).thenReturn(Optional.of(inventory));
         when(beerInventoryRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
-        when(dateTimeProvider.now()).thenReturn(LOCAL_DATE_TIME);
+        when(dateTimeProvider.now()).thenReturn(OFFSET_DATE_TIME);
 
         // when
         final var result = beerInventoryService.addStock(inventory.getBeerId(), 10);
@@ -139,10 +140,10 @@ class BeerInventoryServiceTest {
     @Test
     void shouldReserveStockAndReturnInventory() {
         // given
-        final var inventory = createBeerInventory(UUID.fromString("71737f0e-11eb-4775-b8b4-ce945fdee936"), 20, LOCAL_DATE_TIME);
+        final var inventory = createBeerInventory(UUID.fromString("71737f0e-11eb-4775-b8b4-ce945fdee936"), 20);
         when(beerInventoryRepository.findById(inventory.getBeerId())).thenReturn(Optional.of(inventory));
         when(beerInventoryRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
-        when(dateTimeProvider.now()).thenReturn(LOCAL_DATE_TIME);
+        when(dateTimeProvider.now()).thenReturn(OFFSET_DATE_TIME);
 
         // when
         final var result = beerInventoryService.reserveStock(inventory.getBeerId(), 10);
@@ -165,7 +166,7 @@ class BeerInventoryServiceTest {
     @Test
     void shouldThrowExceptionWhenTryReserveStockButNotEnoughStock() {
         // given
-        final var inventory = createBeerInventory(UUID.fromString("71737f0e-11eb-4775-b8b4-ce945fdee936"), 3, LOCAL_DATE_TIME);
+        final var inventory = createBeerInventory(UUID.fromString("71737f0e-11eb-4775-b8b4-ce945fdee936"), 3);
         when(beerInventoryRepository.findById(inventory.getBeerId())).thenReturn(Optional.of(inventory));
         when(beerInventoryRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -180,10 +181,10 @@ class BeerInventoryServiceTest {
     @Test
     void shouldReleaseStockAndReturnInventory() {
         // given
-        final var inventory = createBeerInventory(UUID.fromString("71737f0e-11eb-4775-b8b4-ce945fdee936"), 20, LOCAL_DATE_TIME);
+        final var inventory = createBeerInventory(UUID.fromString("71737f0e-11eb-4775-b8b4-ce945fdee936"), 20);
         when(beerInventoryRepository.findById(inventory.getBeerId())).thenReturn(Optional.of(inventory));
         when(beerInventoryRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
-        when(dateTimeProvider.now()).thenReturn(LOCAL_DATE_TIME);
+        when(dateTimeProvider.now()).thenReturn(OFFSET_DATE_TIME);
 
         // when
         final var result = beerInventoryService.releaseStock(inventory.getBeerId(), 10);
@@ -206,7 +207,7 @@ class BeerInventoryServiceTest {
     @Test
     void shouldDeleteInventoryWhenInventoryExists() {
         // given
-        final var inventory = createBeerInventory(UUID.fromString("71737f0e-11eb-4775-b8b4-ce945fdee936"), 1, LOCAL_DATE_TIME);
+        final var inventory = createBeerInventory(UUID.fromString("71737f0e-11eb-4775-b8b4-ce945fdee936"), 1);
         when(beerInventoryRepository.findById(inventory.getBeerId())).thenReturn(Optional.of(inventory));
         doNothing().when(beerInventoryRepository).deleteById(inventory.getBeerId());
 
@@ -221,7 +222,7 @@ class BeerInventoryServiceTest {
     @Test
     void shouldThrowExceptionWhenInventoryNotFound() {
         // given
-        final var inventory = createBeerInventory(UUID.fromString("71737f0e-11eb-4775-b8b4-ce945fdee936"), 1, LOCAL_DATE_TIME);
+        final var inventory = createBeerInventory(UUID.fromString("71737f0e-11eb-4775-b8b4-ce945fdee936"), 1);
         when(beerInventoryRepository.findById(inventory.getBeerId())).thenReturn(Optional.empty());
 
         // when
@@ -232,11 +233,11 @@ class BeerInventoryServiceTest {
         verify(beerInventoryRepository, never()).deleteById(any());
     }
 
-    private BeerInventory createBeerInventory(UUID id, int availableStock, LocalDateTime localDateTime) {
+    private BeerInventory createBeerInventory(UUID id, int availableStock) {
         final var beerInventory = BeerInventory.builder()
                 .beerId(id)
                 .build();
-        beerInventory.addStock(availableStock, localDateTime);
+        beerInventory.addStock(availableStock, BeerInventoryServiceTest.OFFSET_DATE_TIME);
         return beerInventory;
     }
 }
