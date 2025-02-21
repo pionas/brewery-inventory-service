@@ -1,33 +1,5 @@
 spring:
   application:
     name: brewery-inventory-service
-  datasource:
-    url: jdbc:h2:mem:brewery-inventory-service;MODE=MYSQL
-    username: sa
-    password: password
-    driverClassName: org.h2.Driver
-  h2:
-    console:
-      enabled: true
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-  artemis:
-    user: artemis-user
-    password: artemis-password
-
-queue:
-  inventory:
-    add-stock: beer-inventory-add-stock
-    allocate-stock: beer-inventory-allocate-stock
-    deallocate-stock: beer-inventory-deallocate-stock
-    allocate-response: beer-inventory-allocate-response
-
-server:
-  port: 8081
-
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://netflix:eureka@localhost:8761/eureka
-    fetch-registry: true
-    register-with-eureka: true
+  config:
+    import: "configserver:"
