@@ -1,3 +1,13 @@
 spring:
   application:
     name: brewery-inventory-service
+
+queue:
+  inventory:
+    add-stock: beer-inventory-add-stock-test
+    allocate-stock: beer-inventory-allocate-stock-test
+    deallocate-stock: beer-inventory-deallocate-stock-test
+    allocate-response: beer-inventory-allocate-response-test
+
+server:
+  port: 8888
